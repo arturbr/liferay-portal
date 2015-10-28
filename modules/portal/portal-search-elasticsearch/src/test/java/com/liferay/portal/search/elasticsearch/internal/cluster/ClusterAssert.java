@@ -123,6 +123,42 @@ public class ClusterAssert {
 			});
 	}
 
+	public static void assert2PrimaryShards1ReplicaAnd2Nodes(
+			ElasticsearchFixture elasticsearchFixture)
+		throws Exception {
+
+		ClusterAssert.assertHealth(
+			elasticsearchFixture,
+			new HealthExpectations() {
+				{
+					activePrimaryShards = 2;
+					activeShards = 4;
+					numberOfDataNodes = 2;
+					numberOfNodes = 2;
+					status = GREEN;
+					unassignedShards = 0;
+				}
+			});
+	}
+
+	public static void assert2PrimaryShardsAnd2Nodes(
+			ElasticsearchFixture elasticsearchFixture)
+		throws Exception {
+
+		ClusterAssert.assertHealth(
+			elasticsearchFixture,
+			new HealthExpectations() {
+				{
+					activePrimaryShards = 2;
+					activeShards = 2;
+					numberOfDataNodes = 2;
+					numberOfNodes = 2;
+					status = GREEN;
+					unassignedShards = 0;
+				}
+			});
+	}
+
 	public static void assert2ReplicaShards(
 			ElasticsearchFixture elasticsearchFixture)
 		throws Exception {
