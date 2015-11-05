@@ -66,16 +66,36 @@ public class FacetedSearchTest {
 		WorkflowThreadLocal.setEnabled(false);
 
 		_group = GroupTestUtil.addGroup();
+	}
+	
+	@Test
+	public void testAssetTagNamesQuotedSearch() throws Exception {
+		updateUser(_group.getGroupId(), "tag name");
+		
+		SearchContext searchContext = SearchContextTestUtil.getSearchContext(
+			_group.getGroupId());
+		
+		String searchableContent = "\"tag\"";
 
-		updateUser(_group.getGroupId(), _TAG_NAME);
+		searchContext.setKeywords(searchableContent);
+		
+		Indexer<?> indexer = FacetedSearcher.getInstance();
+		
+		Hits hits = indexer.search(searchContext);
+		
+		Assert.assertEquals(1, hits.getLength());
 	}
 
 	@Test
 	public void testAssetTagNamesFacet() throws Exception {
+		String tagName = "enterprise. open-source for life";
+
+		updateUser(_group.getGroupId(), tagName);
+
 		SearchContext searchContext = SearchContextTestUtil.getSearchContext(
 			_group.getGroupId());
 
-		searchContext.setKeywords(_TAG_NAME);
+		searchContext.setKeywords(tagName);
 
 		MultiValueFacet multiValueFacet = new MultiValueFacet(searchContext);
 
@@ -102,7 +122,7 @@ public class FacetedSearchTest {
 
 		TermCollector termCollector = termCollectors.get(0);
 
-		Assert.assertEquals(_TAG_NAME, termCollector.getTerm());
+		Assert.assertEquals(tagName, termCollector.getTerm());
 		Assert.assertEquals(1, termCollector.getFrequency());
 	}
 
@@ -119,8 +139,6 @@ public class FacetedSearchTest {
 
 		UserTestUtil.updateUser(user, serviceContext);
 	}
-
-	private static final String _TAG_NAME = "enterprise. open-source for life";
 
 	@DeleteAfterTestRun
 	private Group _group;
