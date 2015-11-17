@@ -23,8 +23,7 @@ import com.liferay.portal.search.elasticsearch.settings.SettingsContributor;
 
 import java.util.Map;
 
-import org.elasticsearch.common.settings.ImmutableSettings;
-
+import org.elasticsearch.common.settings.Settings;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
@@ -45,7 +44,7 @@ public class UnicastSettingsContributor extends BaseSettingsContributor {
 	}
 
 	@Override
-	public void populate(ImmutableSettings.Builder builder) {
+	public void populate(Settings.Builder builder) {
 		if (!_clusterSettingsContext.isClusterEnabled()) {
 			return;
 		}
