@@ -18,9 +18,9 @@ import com.liferay.portal.kernel.search.filter.GeoDistanceFilter;
 import com.liferay.portal.kernel.search.geolocation.GeoLocationPoint;
 import com.liferay.portal.search.elasticsearch.filter.GeoDistanceFilterTranslator;
 
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.GeoDistanceFilterBuilder;
+import org.elasticsearch.index.query.GeoDistanceQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -32,13 +32,9 @@ public class GeoDistanceFilterTranslatorImpl
 	implements GeoDistanceFilterTranslator {
 
 	@Override
-	public FilterBuilder translate(GeoDistanceFilter geoDistanceFilter) {
-		GeoDistanceFilterBuilder geoDistanceFilterBuilder =
-			FilterBuilders.geoDistanceFilter(geoDistanceFilter.getField());
-
-		if (geoDistanceFilter.isCached() != null) {
-			geoDistanceFilterBuilder.cache(geoDistanceFilter.isCached());
-		}
+	public QueryBuilder translate(GeoDistanceFilter geoDistanceFilter) {
+		GeoDistanceQueryBuilder geoDistanceFilterBuilder =
+			QueryBuilders.geoDistanceQuery(geoDistanceFilter.getField());
 
 		geoDistanceFilterBuilder.distance(
 			String.valueOf(geoDistanceFilter.getGeoDistance()));

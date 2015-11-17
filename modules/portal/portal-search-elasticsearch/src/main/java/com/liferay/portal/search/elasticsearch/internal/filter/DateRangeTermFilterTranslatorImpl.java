@@ -21,9 +21,9 @@ import com.liferay.portal.search.elasticsearch.filter.DateRangeTermFilterTransla
 import java.text.Format;
 import java.text.ParseException;
 
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.RangeFilterBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -35,13 +35,9 @@ public class DateRangeTermFilterTranslatorImpl
 	implements DateRangeTermFilterTranslator {
 
 	@Override
-	public FilterBuilder translate(DateRangeTermFilter dateRangeTermFilter) {
-		RangeFilterBuilder rangeFilterBuilder = FilterBuilders.rangeFilter(
+	public QueryBuilder translate(DateRangeTermFilter dateRangeTermFilter) {
+		RangeQueryBuilder rangeFilterBuilder = QueryBuilders.rangeQuery(
 			dateRangeTermFilter.getField());
-
-		if (dateRangeTermFilter.isCached() != null) {
-			rangeFilterBuilder.cache(dateRangeTermFilter.isCached());
-		}
 
 		Format format = FastDateFormatFactoryUtil.getSimpleDateFormat(
 			dateRangeTermFilter.getDateFormat(),
