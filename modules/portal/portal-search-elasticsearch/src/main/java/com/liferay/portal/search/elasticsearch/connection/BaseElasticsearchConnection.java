@@ -23,6 +23,8 @@ import com.liferay.portal.search.elasticsearch.configuration.ElasticsearchConfig
 import com.liferay.portal.search.elasticsearch.index.IndexFactory;
 import com.liferay.portal.search.elasticsearch.settings.SettingsContributor;
 
+import java.io.InputStream;
+
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Future;
@@ -141,11 +143,14 @@ public abstract class BaseElasticsearchConnection
 
 		try {
 			Class<?> clazz = getClass();
+			
+			ClassLoader classLoader = clazz.getClassLoader();
 
-			builder.classLoader(clazz.getClassLoader());
+			String defaultConfiguration = "/META-INF/elasticsearch-optional-defaults.yml";
 
-			builder.loadFromClasspath(
-				"/META-INF/elasticsearch-optional-defaults.yml");
+			InputStream inputStream = classLoader.getResourceAsStream(defaultConfiguration);
+
+			builder.loadFromStream(defaultConfiguration, inputStream);
 		}
 		catch (Exception e) {
 			if (_log.isInfoEnabled()) {

@@ -26,7 +26,6 @@ import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -70,7 +69,7 @@ public class MultiMatchQueryTranslatorImpl
 
 		if (multiMatchQuery.getFuzziness() != null) {
 			multiMatchQueryBuilder.fuzziness(
-				Fuzziness.fromSimilarity(multiMatchQuery.getFuzziness()));
+				Fuzziness.build(multiMatchQuery.getFuzziness()));
 		}
 
 		if (multiMatchQuery.getFuzzyRewriteMethod() != null) {

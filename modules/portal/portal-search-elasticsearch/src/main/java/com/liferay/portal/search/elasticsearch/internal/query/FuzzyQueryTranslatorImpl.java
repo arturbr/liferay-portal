@@ -21,7 +21,6 @@ import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.FuzzyQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -37,7 +36,7 @@ public class FuzzyQueryTranslatorImpl implements FuzzyQueryTranslator {
 
 		if (fuzzyQuery.getFuzziness() != null) {
 			fuzzyQueryBuilder.fuzziness(
-				Fuzziness.fromSimilarity(fuzzyQuery.getFuzziness()));
+				Fuzziness.build(fuzzyQuery.getFuzziness()));
 		}
 
 		if (fuzzyQuery.getMaxExpansions() != null) {
