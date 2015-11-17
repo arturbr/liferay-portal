@@ -72,7 +72,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.geo.GeoDistance;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.index.query.FilterBuilder;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -88,7 +88,6 @@ import org.elasticsearch.search.sort.GeoDistanceSortBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
@@ -468,21 +467,25 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		}
 
 		if (query.getPostFilter() != null) {
-			FilterBuilder filterBuilder = _filterTranslator.translate(
+			QueryBuilder queryBuilderPostFilter = _filterTranslator.translate(
 				query.getPostFilter(), searchContext);
 
-			searchRequestBuilder.setPostFilter(filterBuilder);
+			searchRequestBuilder.setPostFilter(queryBuilderPostFilter);
 		}
 
 		QueryBuilder queryBuilder = _queryTranslator.translate(
 			query, searchContext);
 
 		if (query.getPreBooleanFilter() != null) {
-			FilterBuilder filterBuilder = _filterTranslator.translate(
+			QueryBuilder queryBuilderPreFilter = _filterTranslator.translate(
 				query.getPreBooleanFilter(), searchContext);
 
-			queryBuilder = QueryBuilders.filteredQuery(
-				queryBuilder, filterBuilder);
+			BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+			
+			boolQueryBuilder.must(queryBuilder);
+			boolQueryBuilder.filter(queryBuilderPreFilter);
+			
+			queryBuilder = boolQueryBuilder;
 		}
 
 		searchRequestBuilder.setQuery(queryBuilder);
@@ -636,7 +639,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
 	protected void setFilterTranslator(
-		FilterTranslator<FilterBuilder> filterTranslator) {
+		FilterTranslator<QueryBuilder> filterTranslator) {
 
 		_filterTranslator = filterTranslator;
 	}
@@ -756,7 +759,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 	private volatile ElasticsearchConfiguration _elasticsearchConfiguration;
 	private ElasticsearchConnectionManager _elasticsearchConnectionManager;
 	private FacetProcessor<SearchRequestBuilder> _facetProcessor;
-	private FilterTranslator<FilterBuilder> _filterTranslator;
+	private FilterTranslator<QueryBuilder> _filterTranslator;
 	private GroupByTranslator _groupByTranslator;
 	private boolean _logExceptionsOnly;
 	private QueryTranslator<QueryBuilder> _queryTranslator;
