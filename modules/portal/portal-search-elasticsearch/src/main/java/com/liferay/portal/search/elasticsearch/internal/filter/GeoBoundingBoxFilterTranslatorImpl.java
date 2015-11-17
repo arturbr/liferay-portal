@@ -19,10 +19,9 @@ import com.liferay.portal.kernel.search.geolocation.GeoLocationPoint;
 import com.liferay.portal.search.elasticsearch.filter.GeoBoundingBoxFilterTranslator;
 
 import org.elasticsearch.common.geo.GeoPoint;
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.GeoBoundingBoxFilterBuilder;
-
+import org.elasticsearch.index.query.GeoBoundingBoxQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -33,9 +32,9 @@ public class GeoBoundingBoxFilterTranslatorImpl
 	implements GeoBoundingBoxFilterTranslator {
 
 	@Override
-	public FilterBuilder translate(GeoBoundingBoxFilter geoBoundingBoxFilter) {
-		GeoBoundingBoxFilterBuilder geoBoundingBoxFilterBuilder =
-			FilterBuilders.geoBoundingBoxFilter(
+	public QueryBuilder translate(GeoBoundingBoxFilter geoBoundingBoxFilter) {
+		GeoBoundingBoxQueryBuilder geoBoundingBoxFilterBuilder =
+			QueryBuilders.geoBoundingBoxQuery(
 				geoBoundingBoxFilter.getField());
 
 		GeoLocationPoint bottomRightGeoLocationPoint =
@@ -46,10 +45,6 @@ public class GeoBoundingBoxFilterTranslatorImpl
 			bottomRightGeoLocationPoint.getLongitude());
 
 		geoBoundingBoxFilterBuilder.bottomRight(bottomRightGeoPoint);
-
-		if (geoBoundingBoxFilter.isCached() != null) {
-			geoBoundingBoxFilterBuilder.cache(geoBoundingBoxFilter.isCached());
-		}
 
 		GeoLocationPoint topLeftGeoLocationPoint =
 			geoBoundingBoxFilter.getTopLeftGeoLocationPoint();

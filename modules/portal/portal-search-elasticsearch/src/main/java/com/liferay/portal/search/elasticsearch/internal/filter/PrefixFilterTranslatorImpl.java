@@ -17,10 +17,9 @@ package com.liferay.portal.search.elasticsearch.internal.filter;
 import com.liferay.portal.kernel.search.filter.PrefixFilter;
 import com.liferay.portal.search.elasticsearch.filter.PrefixFilterTranslator;
 
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.PrefixFilterBuilder;
-
+import org.elasticsearch.index.query.PrefixQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -30,15 +29,11 @@ import org.osgi.service.component.annotations.Component;
 public class PrefixFilterTranslatorImpl implements PrefixFilterTranslator {
 
 	@Override
-	public FilterBuilder translate(PrefixFilter prefixFilter) {
-		PrefixFilterBuilder prefixFilterBuilder = FilterBuilders.prefixFilter(
+	public QueryBuilder translate(PrefixFilter prefixFilter) {
+		PrefixQueryBuilder prefixQueryBuilder = QueryBuilders.prefixQuery(
 			prefixFilter.getField(), prefixFilter.getPrefix());
 
-		if (prefixFilter.isCached() != null) {
-			prefixFilterBuilder.cache(prefixFilter.isCached());
-		}
-
-		return prefixFilterBuilder;
+		return prefixQueryBuilder;
 	}
 
 }

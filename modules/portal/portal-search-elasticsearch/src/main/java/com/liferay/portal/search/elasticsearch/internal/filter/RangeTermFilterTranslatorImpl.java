@@ -17,10 +17,9 @@ package com.liferay.portal.search.elasticsearch.internal.filter;
 import com.liferay.portal.kernel.search.filter.RangeTermFilter;
 import com.liferay.portal.search.elasticsearch.filter.RangeTermFilterTranslator;
 
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.RangeFilterBuilder;
-
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -31,13 +30,9 @@ public class RangeTermFilterTranslatorImpl
 	implements RangeTermFilterTranslator {
 
 	@Override
-	public FilterBuilder translate(RangeTermFilter rangeTermFilter) {
-		RangeFilterBuilder rangeFilterBuilder = FilterBuilders.rangeFilter(
+	public QueryBuilder translate(RangeTermFilter rangeTermFilter) {
+		RangeQueryBuilder rangeFilterBuilder = QueryBuilders.rangeQuery(
 			rangeTermFilter.getField());
-
-		if (rangeTermFilter.isCached() != null) {
-			rangeFilterBuilder.cache(rangeTermFilter.isCached());
-		}
 
 		rangeFilterBuilder.from(rangeTermFilter.getLowerBound());
 		rangeFilterBuilder.includeLower(rangeTermFilter.isIncludesLower());
