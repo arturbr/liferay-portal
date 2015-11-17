@@ -17,10 +17,11 @@ package com.liferay.portal.search.solr.internal.filter;
 import com.liferay.portal.kernel.search.filter.TermsFilter;
 import com.liferay.portal.search.solr.filter.TermsFilterTranslator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.queries.TermsQuery;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -32,24 +33,14 @@ public class TermsFilterTranslatorImpl implements TermsFilterTranslator {
 
 	@Override
 	public org.apache.lucene.search.Query translate(TermsFilter termsFilter) {
-		BooleanQuery booleanQuery = new BooleanQuery();
-
 		String field = termsFilter.getField();
+		List<Term> terms = new ArrayList<Term>();
 
 		for (String value : termsFilter.getValues()) {
-			Term term = new Term(field, value);
-
-			TermQuery termQuery = new TermQuery(term);
-
-			if (termsFilter.getExecution() == TermsFilter.Execution.AND) {
-				booleanQuery.add(termQuery, BooleanClause.Occur.MUST);
-			}
-			else {
-				booleanQuery.add(termQuery, BooleanClause.Occur.SHOULD);
-			}
+			terms.add(new Term(field, value));
 		}
 
-		return booleanQuery;
+		return new TermsQuery(terms);
 	}
 
 }
