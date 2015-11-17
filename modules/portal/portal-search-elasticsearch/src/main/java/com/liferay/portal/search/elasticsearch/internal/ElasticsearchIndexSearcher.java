@@ -720,7 +720,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 			groupedHits.setLength((int)groupedSearchHits.getTotalHits());
 
-			hits.addGroupedHits(bucket.getKey(), groupedHits);
+			hits.addGroupedHits(bucket.getKeyAsString(), groupedHits);
 		}
 	}
 

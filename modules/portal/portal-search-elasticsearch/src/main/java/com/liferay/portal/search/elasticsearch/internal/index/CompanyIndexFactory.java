@@ -28,6 +28,8 @@ import com.liferay.portal.search.elasticsearch.index.IndexFactory;
 import com.liferay.portal.search.elasticsearch.internal.util.LogUtil;
 import com.liferay.portal.search.elasticsearch.settings.IndexSettingsContributor;
 
+import java.io.InputStream;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -203,10 +205,12 @@ public class CompanyIndexFactory implements IndexFactory {
 		}
 
 		Class<?> clazz = getClass();
+		
+		ClassLoader classLoader = clazz.getClassLoader();
 
-		builder.classLoader(clazz.getClassLoader());
+		InputStream inputStream = classLoader.getResourceAsStream(_indexConfigFileName);
 
-		builder.loadFromClasspath(_indexConfigFileName);
+		builder.loadFromStream(_indexConfigFileName, inputStream);
 	}
 
 	protected void loadIndexSettingsContributors(
