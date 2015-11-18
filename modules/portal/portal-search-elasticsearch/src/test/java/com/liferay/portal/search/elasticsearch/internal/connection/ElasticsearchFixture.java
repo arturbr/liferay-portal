@@ -43,9 +43,8 @@ import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.ClusterAdminClient;
 import org.elasticsearch.client.IndicesAdminClient;
-import org.elasticsearch.common.settings.ImmutableSettings.Builder;
+import org.elasticsearch.common.settings.Settings.Builder;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.indices.IndexMissingException;
 
 import org.mockito.Mockito;
 
@@ -83,11 +82,7 @@ public class ElasticsearchFixture {
 		DeleteIndexRequestBuilder deleteIndexRequestBuilder =
 			indicesAdminClient.prepareDelete(indexName);
 
-		try {
-			deleteIndexRequestBuilder.get();
-		}
-		catch (IndexMissingException ime) {
-		}
+		deleteIndexRequestBuilder.get();
 
 		CreateIndexRequestBuilder createIndexRequestBuilder =
 			indicesAdminClient.prepareCreate(indexName);
