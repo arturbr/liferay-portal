@@ -24,6 +24,7 @@ import com.liferay.portal.search.elasticsearch.settings.SettingsContributor;
 import java.util.Map;
 
 import org.elasticsearch.common.settings.Settings;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;

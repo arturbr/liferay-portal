@@ -41,6 +41,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchAllQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -149,7 +150,7 @@ public class ElasticsearchIndexWriter extends BaseIndexWriter {
 				Field.ENTRY_CLASS_NAME, className);
 
 			BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
-			
+
 			queryBuilder.must(matchAllQueryBuilder);
 			queryBuilder.filter(termFilterBuilder);
 

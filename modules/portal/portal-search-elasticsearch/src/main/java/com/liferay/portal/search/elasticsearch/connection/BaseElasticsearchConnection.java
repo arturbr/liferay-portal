@@ -138,17 +138,17 @@ public abstract class BaseElasticsearchConnection
 		return _indexFactory;
 	}
 
-	protected void loadOptionalDefaultConfigurations(
-		Settings.Builder builder) {
-
+	protected void loadOptionalDefaultConfigurations(Settings.Builder builder) {
 		try {
 			Class<?> clazz = getClass();
-			
+
 			ClassLoader classLoader = clazz.getClassLoader();
 
-			String defaultConfiguration = "/META-INF/elasticsearch-optional-defaults.yml";
+			String defaultConfiguration =
+				"/META-INF/elasticsearch-optional-defaults.yml";
 
-			InputStream inputStream = classLoader.getResourceAsStream(defaultConfiguration);
+			InputStream inputStream = classLoader.getResourceAsStream(
+				defaultConfiguration);
 
 			builder.loadFromStream(defaultConfiguration, inputStream);
 		}

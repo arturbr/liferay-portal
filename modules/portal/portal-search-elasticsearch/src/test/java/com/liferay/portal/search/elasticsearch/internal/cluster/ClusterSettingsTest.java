@@ -18,15 +18,15 @@ import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.search.elasticsearch.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.search.elasticsearch.internal.connection.EmbeddedElasticsearchConnection;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import org.elasticsearch.cluster.service.InternalClusterService;
 import org.elasticsearch.common.inject.Injector;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.node.Node;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author William Newbury

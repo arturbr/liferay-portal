@@ -23,6 +23,7 @@ import com.liferay.portal.search.elasticsearch.filter.BooleanFilterTranslator;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+
 import org.osgi.service.component.annotations.Component;
 
 /**

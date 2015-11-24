@@ -16,7 +16,6 @@ package com.liferay.portal.search.elasticsearch.settings;
 
 import org.elasticsearch.common.settings.Settings;
 
-
 /**
  * @author André de Oliveira
  */

@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.search.query.QueryTranslator;
 import com.liferay.portal.search.elasticsearch.filter.QueryFilterTranslator;
 
 import org.elasticsearch.index.query.QueryBuilder;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 

@@ -46,6 +46,7 @@ import com.liferay.portal.search.elasticsearch.filter.TermFilterTranslator;
 import com.liferay.portal.search.elasticsearch.filter.TermsFilterTranslator;
 
 import org.elasticsearch.index.query.QueryBuilder;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
