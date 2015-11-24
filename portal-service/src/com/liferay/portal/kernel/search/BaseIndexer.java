@@ -777,7 +777,7 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 				Field.EXPIRATION_DATE, assetEntry.getExpirationDate());
 		}
 		else {
-			document.addDate(Field.EXPIRATION_DATE, new Date(Long.MAX_VALUE));
+			document.addDate(Field.EXPIRATION_DATE, new Date("Sat, 12 Aug 9995 13:30:00 GMT"));
 		}
 
 		if (!document.hasField(Field.MODIFIED_DATE)) {
