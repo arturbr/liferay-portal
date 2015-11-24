@@ -287,7 +287,7 @@
 			{
 				"template_ja": {
 					"mapping": {
-						"analyzer": "kuromoji",
+						"analyzer": "italian",
 						"index": "analyzed",
 						"store": "true",
 						"term_vector": "with_positions_offsets",
@@ -440,7 +440,7 @@
 			{
 				"template_zh": {
 					"mapping": {
-						"analyzer": "smartcn",
+						"analyzer": "turkish",
 						"index": "analyzed",
 						"store": "true",
 						"term_vector": "with_positions_offsets",
