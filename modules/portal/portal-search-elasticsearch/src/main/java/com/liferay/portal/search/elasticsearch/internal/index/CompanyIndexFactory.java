@@ -45,6 +45,7 @@ import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.settings.Settings.Builder;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
@@ -205,17 +206,16 @@ public class CompanyIndexFactory implements IndexFactory {
 		}
 
 		Class<?> clazz = getClass();
-		
+
 		ClassLoader classLoader = clazz.getClassLoader();
 
-		InputStream inputStream = classLoader.getResourceAsStream(_indexConfigFileName);
+		InputStream inputStream = classLoader.getResourceAsStream(
+			_indexConfigFileName);
 
 		builder.loadFromStream(_indexConfigFileName, inputStream);
 	}
 
-	protected void loadIndexSettingsContributors(
-		Settings.Builder builder) {
-
+	protected void loadIndexSettingsContributors(Settings.Builder builder) {
 		for (IndexSettingsContributor indexSettingsContributor :
 				_indexSettingsContributors) {
 

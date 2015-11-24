@@ -88,6 +88,7 @@ import org.elasticsearch.search.sort.GeoDistanceSortBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
@@ -481,10 +482,10 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 				query.getPreBooleanFilter(), searchContext);
 
 			BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-			
+
 			boolQueryBuilder.must(queryBuilder);
 			boolQueryBuilder.filter(queryBuilderPreFilter);
-			
+
 			queryBuilder = boolQueryBuilder;
 		}
 

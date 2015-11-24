@@ -20,6 +20,7 @@ import com.liferay.portal.search.elasticsearch.filter.RangeTermFilterTranslator;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+
 import org.osgi.service.component.annotations.Component;
 
 /**

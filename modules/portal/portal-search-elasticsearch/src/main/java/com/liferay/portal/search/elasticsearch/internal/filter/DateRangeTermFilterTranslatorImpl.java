@@ -24,6 +24,7 @@ import java.text.ParseException;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+
 import org.osgi.service.component.annotations.Component;
 
 /**

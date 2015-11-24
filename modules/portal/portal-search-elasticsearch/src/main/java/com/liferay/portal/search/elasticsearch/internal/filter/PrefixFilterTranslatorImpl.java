@@ -20,6 +20,7 @@ import com.liferay.portal.search.elasticsearch.filter.PrefixFilterTranslator;
 import org.elasticsearch.index.query.PrefixQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+
 import org.osgi.service.component.annotations.Component;
 
 /**

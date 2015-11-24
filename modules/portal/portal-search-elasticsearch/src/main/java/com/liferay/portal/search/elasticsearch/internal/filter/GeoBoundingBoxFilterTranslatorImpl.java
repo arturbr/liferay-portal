@@ -22,6 +22,7 @@ import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.index.query.GeoBoundingBoxQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -34,8 +35,7 @@ public class GeoBoundingBoxFilterTranslatorImpl
 	@Override
 	public QueryBuilder translate(GeoBoundingBoxFilter geoBoundingBoxFilter) {
 		GeoBoundingBoxQueryBuilder geoBoundingBoxFilterBuilder =
-			QueryBuilders.geoBoundingBoxQuery(
-				geoBoundingBoxFilter.getField());
+			QueryBuilders.geoBoundingBoxQuery(geoBoundingBoxFilter.getField());
 
 		GeoLocationPoint bottomRightGeoLocationPoint =
 			geoBoundingBoxFilter.getBottomRightGeoLocationPoint();

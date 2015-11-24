@@ -34,9 +34,9 @@ import com.liferay.portal.search.elasticsearch.index.IndexFactory;
 import com.liferay.portal.search.elasticsearch.internal.cluster.ClusterSettingsContext;
 import com.liferay.portal.search.elasticsearch.settings.SettingsContributor;
 
-import java.util.Map;
-
 import java.net.InetAddress;
+
+import java.util.Map;
 
 import org.apache.commons.lang.time.StopWatch;
 
@@ -44,6 +44,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -149,7 +150,7 @@ public class EmbeddedElasticsearchConnection
 
 	protected void configurePaths(Settings.Builder builder) {
 		builder.put(
-			"path.home", 
+			"path.home",
 			_props.get(PropsKeys.LIFERAY_HOME) + "/data/elasticsearch");
 		builder.put(
 			"path.data",
@@ -205,9 +206,7 @@ public class EmbeddedElasticsearchConnection
 	}
 
 	@Override
-	protected void loadRequiredDefaultConfigurations(
-		Settings.Builder builder) {
-
+	protected void loadRequiredDefaultConfigurations(Settings.Builder builder) {
 		builder.put(
 			"bootstrap.mlockall",
 			elasticsearchConfiguration.bootstrapMlockAll());

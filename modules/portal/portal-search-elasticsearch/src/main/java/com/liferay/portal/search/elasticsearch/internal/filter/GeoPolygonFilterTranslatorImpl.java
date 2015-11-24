@@ -21,6 +21,7 @@ import com.liferay.portal.search.elasticsearch.filter.GeoPolygonFilterTranslator
 import org.elasticsearch.index.query.GeoPolygonQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+
 import org.osgi.service.component.annotations.Component;
 
 /**

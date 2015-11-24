@@ -32,16 +32,17 @@ import com.liferay.portal.search.elasticsearch.connection.OperationMode;
 import com.liferay.portal.search.elasticsearch.index.IndexFactory;
 import com.liferay.portal.search.elasticsearch.settings.SettingsContributor;
 
+import java.net.InetAddress;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import java.net.InetAddress;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -100,9 +101,10 @@ public class RemoteElasticsearchConnection extends BaseElasticsearchConnection {
 			throw new IllegalStateException(
 				"There must be at least one transport address");
 		}
-		
-		TransportClient.Builder transportClientBuilder = TransportClient.builder();
-		
+
+		TransportClient.Builder transportClientBuilder =
+			TransportClient.builder();
+
 		transportClientBuilder.settings(builder);
 
 		TransportClient transportClient = transportClientBuilder.build();
@@ -138,9 +140,7 @@ public class RemoteElasticsearchConnection extends BaseElasticsearchConnection {
 	}
 
 	@Override
-	protected void loadRequiredDefaultConfigurations(
-		Settings.Builder builder) {
-
+	protected void loadRequiredDefaultConfigurations(Settings.Builder builder) {
 		builder.put(
 			"client.transport.ignore_cluster_name",
 			elasticsearchConfiguration.clientTransportIgnoreClusterName());

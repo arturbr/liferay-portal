@@ -25,7 +25,6 @@ import org.elasticsearch.index.query.QueryBuilder;
 public interface BooleanFilterTranslator {
 
 	public QueryBuilder translate(
-		BooleanFilter booleanFilter,
-		FilterVisitor<QueryBuilder> filterVisitor);
+		BooleanFilter booleanFilter, FilterVisitor<QueryBuilder> filterVisitor);
 
 }

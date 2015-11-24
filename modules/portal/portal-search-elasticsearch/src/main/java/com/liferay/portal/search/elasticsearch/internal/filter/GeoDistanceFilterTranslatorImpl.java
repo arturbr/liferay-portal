@@ -21,6 +21,7 @@ import com.liferay.portal.search.elasticsearch.filter.GeoDistanceFilterTranslato
 import org.elasticsearch.index.query.GeoDistanceQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+
 import org.osgi.service.component.annotations.Component;
 
 /**
