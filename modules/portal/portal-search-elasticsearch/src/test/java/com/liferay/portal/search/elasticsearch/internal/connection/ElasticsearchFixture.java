@@ -37,6 +37,7 @@ import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequestBuilder
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequestBuilder;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.client.AdminClient;
@@ -79,10 +80,17 @@ public class ElasticsearchFixture {
 
 		IndicesAdminClient indicesAdminClient = getIndicesAdminClient();
 
-		DeleteIndexRequestBuilder deleteIndexRequestBuilder =
-			indicesAdminClient.prepareDelete(indexName);
+		IndicesExistsRequestBuilder indicesExistsRequestBuilder =
+			indicesAdminClient.prepareExists(indexName);
 
-		deleteIndexRequestBuilder.get();
+		boolean indicesExists = indicesExistsRequestBuilder.get().isExists();
+
+		if (indicesExists) {
+			DeleteIndexRequestBuilder deleteIndexRequestBuilder =
+				indicesAdminClient.prepareDelete(indexName);
+
+			deleteIndexRequestBuilder.get();
+		}
 
 		CreateIndexRequestBuilder createIndexRequestBuilder =
 			indicesAdminClient.prepareCreate(indexName);
