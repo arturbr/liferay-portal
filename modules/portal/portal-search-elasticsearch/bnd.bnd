@@ -1,9 +1,5 @@
 Bundle-ClassPath: \
 	.,\
-	lib/analysis-icu.jar,\
-	lib/analysis-kuromoji.jar,\
-	lib/analysis-smartcn.jar,\
-	lib/analysis-stempel.jar,\
 	lib/antlr-runtime.jar,\
 	lib/asm-commons.jar,\
 	lib/asm.jar,\
@@ -12,7 +8,6 @@ Bundle-ClassPath: \
 	lib/elasticsearch.jar,\
 	lib/guava.jar,\
 	lib/hppc.jar,\
-	lib/icu4j.jar,\
 	lib/jackson-core.jar,\
 	lib/jackson-dataformat-smile.jar,\
 	lib/jackson-dataformat-yaml.jar,\
@@ -21,10 +16,6 @@ Bundle-ClassPath: \
 	lib/jsr166e.jar,\
 	lib/jts.jar,\
 	lib/lucene-analyzers-common.jar,\
-	lib/lucene-analyzers-icu.jar,\
-	lib/lucene-analyzers-kuromoji.jar,\
-	lib/lucene-analyzers-smartcn.jar,\
-	lib/lucene-analyzers-stempel.jar,\
 	lib/lucene-core.jar,\
 	lib/lucene-grouping.jar,\
 	lib/lucene-highlighter.jar,\
@@ -86,10 +77,6 @@ Import-Package:\
 	!sun.security.*,\
 	*
 Include-Resource:\
-	lib/analysis-icu.jar=lib/analysis-icu.jar,\
-	lib/analysis-kuromoji.jar=lib/analysis-kuromoji.jar,\
-	lib/analysis-smartcn.jar=lib/analysis-smartcn.jar,\
-	lib/analysis-stempel.jar=lib/analysis-stempel.jar,\
 	lib/antlr-runtime.jar=lib/antlr-runtime.jar,\
 	lib/asm-commons.jar=lib/asm-commons.jar,\
 	lib/asm.jar=lib/asm.jar,\
@@ -98,7 +85,6 @@ Include-Resource:\
 	lib/elasticsearch.jar=lib/elasticsearch.jar,\
 	lib/guava.jar=lib/guava.jar,\
 	lib/hppc.jar=lib/hppc.jar,\
-	lib/icu4j.jar=lib/icu4j.jar,\
 	lib/jackson-core.jar=lib/jackson-core.jar,\
 	lib/jackson-dataformat-smile.jar=lib/jackson-dataformat-smile.jar,\
 	lib/jackson-dataformat-yaml.jar=lib/jackson-dataformat-yaml.jar,\
@@ -107,10 +93,6 @@ Include-Resource:\
 	lib/jsr166e.jar=lib/jsr166e.jar,\
 	lib/jts.jar=lib/jts.jar,\
 	lib/lucene-analyzers-common.jar=lib/lucene-analyzers-common.jar,\
-	lib/lucene-analyzers-icu.jar=lib/lucene-analyzers-icu.jar,\
-	lib/lucene-analyzers-kuromoji.jar=lib/lucene-analyzers-kuromoji.jar,\
-	lib/lucene-analyzers-smartcn.jar=lib/lucene-analyzers-smartcn.jar,\
-	lib/lucene-analyzers-stempel.jar=lib/lucene-analyzers-stempel.jar,\
 	lib/lucene-core.jar=lib/lucene-core.jar,\
 	lib/lucene-grouping.jar=lib/lucene-grouping.jar,\
 	lib/lucene-highlighter.jar=lib/lucene-highlighter.jar,\
