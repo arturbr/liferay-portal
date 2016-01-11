@@ -34,17 +34,26 @@ import com.liferay.portal.search.elasticsearch.index.IndexFactory;
 import com.liferay.portal.search.elasticsearch.internal.cluster.ClusterSettingsContext;
 import com.liferay.portal.search.elasticsearch.settings.SettingsContributor;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
 import java.net.InetAddress;
 
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.time.StopWatch;
 
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.cli.Terminal;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.settings.Settings.Builder;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.env.Environment;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
+import org.elasticsearch.plugins.PluginManager;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -214,6 +223,72 @@ public class EmbeddedElasticsearchConnection
 		close();
 	}
 
+	protected File getPluginfromResources(String path, String fileName)
+		throws IOException {
+
+		int suffixIndex = fileName.lastIndexOf('.');
+
+		String prefix = fileName.substring(0, suffixIndex);
+		String suffix = fileName.substring(suffixIndex);
+
+		File tempFile = File.createTempFile(prefix, suffix);
+
+		try(InputStream inputStream =
+		getClass().getClassLoader().getResourceAsStream(path + fileName)) {
+
+			FileUtils.copyInputStreamToFile(inputStream, tempFile);
+		}
+
+		tempFile.deleteOnExit();
+
+		return tempFile;
+	}
+
+	protected void loadPlugin(
+			Builder builder, String fileName, String pluginName)
+		throws IOException {
+
+		String pluginsFolder = "plugins/";
+
+		File file = getPluginfromResources(pluginsFolder, fileName);
+
+		try {
+			PluginManager pluginManager = new PluginManager(
+				new Environment(builder.build()), file.toURI().toURL(),
+				PluginManager.OutputMode.DEFAULT, TimeValue.timeValueMillis(0));
+
+			pluginManager.removePlugin(pluginName, Terminal.DEFAULT);
+
+			pluginManager.downloadAndExtract(pluginName, Terminal.DEFAULT);
+		} finally {
+			file.delete();
+		}
+	}
+
+	protected void loadPlugins(Builder builder) {
+		File file = new File(builder.get("path.plugins"));
+
+		file.mkdirs();
+
+		try {
+			loadPlugin(
+				builder, "analysis-icu-2.1.1.zip",
+				"liferay/analysis-icu/2.1.1");
+			loadPlugin(
+				builder, "analysis-kuromoji-2.1.1.zip",
+				"liferay/analysis-kuromoji/2.1.1");
+			loadPlugin(
+				builder, "analysis-smartcn-2.1.1.zip",
+				"liferay/analysis-smartcn/2.1.1");
+			loadPlugin(
+				builder, "analysis-stempel-2.1.1.zip",
+				"liferay/analysis-stempel/2.1.1");
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	@Override
 	protected void loadRequiredDefaultConfigurations(Settings.Builder builder) {
 		builder.put(
@@ -234,6 +309,7 @@ public class EmbeddedElasticsearchConnection
 
 		configurePaths(builder);
 
+		loadPlugins(builder);
 
 		if (PortalRunMode.isTestMode()) {
 			builder.put("index.refresh_interval", "1ms");
