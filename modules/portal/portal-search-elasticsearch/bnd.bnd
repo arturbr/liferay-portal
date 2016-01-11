@@ -3,6 +3,7 @@ Bundle-ClassPath: \
 	lib/antlr-runtime.jar,\
 	lib/asm-commons.jar,\
 	lib/asm.jar,\
+	lib/commons-io.jar,\
 	lib/commons-lang.jar,\
 	lib/compress-lzf.jar,\
 	lib/elasticsearch.jar,\
@@ -57,6 +58,7 @@ Import-Package:\
 	!org.antlr.stringtemplate.*,\
 	!org.apache.bsf.*,\
 	!org.apache.commons.cli.*,\
+	!org.apache.commons.io.*,\
 	!org.apache.commons.lang.*,\
 	!org.apache.ivy.*,\
 	!org.apache.lucene.expressions.*,\
@@ -80,6 +82,7 @@ Include-Resource:\
 	lib/antlr-runtime.jar=lib/antlr-runtime.jar,\
 	lib/asm-commons.jar=lib/asm-commons.jar,\
 	lib/asm.jar=lib/asm.jar,\
+	lib/commons-io.jar=lib/commons-io.jar,\
 	lib/commons-lang.jar=lib/commons-lang.jar,\
 	lib/compress-lzf.jar=lib/compress-lzf.jar,\
 	lib/elasticsearch.jar=lib/elasticsearch.jar,\
