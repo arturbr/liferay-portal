@@ -31,10 +31,10 @@ import com.liferay.portal.search.elasticsearch.connection.OperationMode;
 public interface ElasticsearchConfiguration {
 
 	@Meta.AD(deflt = "", required = false)
-	public String[] additionalConfigurations();
+	public String additionalConfigurations();
 
 	@Meta.AD(deflt = "", required = false)
-	public String[] additionalIndexConfigurations();
+	public String additionalIndexConfigurations();
 
 	@Meta.AD(deflt = "false", required = false)
 	public boolean bootstrapMlockAll();
