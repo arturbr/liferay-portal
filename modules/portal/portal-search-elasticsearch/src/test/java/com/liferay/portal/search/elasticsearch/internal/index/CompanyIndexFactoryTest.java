@@ -59,9 +59,7 @@ public class CompanyIndexFactoryTest {
 	@Test
 	public void testAdditionalIndexConfigurations() throws Exception {
 		_companyIndexFactory.setAdditionalIndexConfigurations(
-			new String[] {
-				"index.number_of_replicas: 1", "index.number_of_shards: 2"
-			});
+			"index.number_of_replicas: 1\nindex.number_of_shards: 2");
 
 		Settings settings = createIndex();
 
@@ -90,9 +88,7 @@ public class CompanyIndexFactoryTest {
 
 			});
 		_companyIndexFactory.setAdditionalIndexConfigurations(
-			new String[] {
-				"index.number_of_replicas: 0", "index.number_of_shards: 0"
-			});
+			"index.number_of_replicas: 0\nindex.number_of_shards: 0");
 
 		Settings settings = createIndex();
 
