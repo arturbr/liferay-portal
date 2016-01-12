@@ -31,13 +31,16 @@ import com.liferay.portal.search.elasticsearch.connection.OperationMode;
 public interface ElasticsearchConfiguration {
 
 	@Meta.AD(
-		description = "Custom node settings in YML format (as seen in elasticsearch.yml)",
+		description = "Custom settings for the local node, in YML format (elasticsearch.yml)",
 		required = false
 	)
 	public String additionalConfigurations();
 
-	@Meta.AD(deflt = "", required = false)
-	public String[] additionalIndexConfigurations();
+	@Meta.AD(
+		description = "Custom settings for the Liferay index, in JSON or YML format (Elasticsearch Create Index API)",
+		required = false
+	)
+	public String additionalIndexConfigurations();
 
 	@Meta.AD(deflt = "false", required = false)
 	public boolean bootstrapMlockAll();
