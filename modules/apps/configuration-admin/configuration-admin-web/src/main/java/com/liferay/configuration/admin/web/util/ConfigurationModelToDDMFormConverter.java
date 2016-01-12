@@ -23,6 +23,7 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.storage.FieldConstants;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
 
@@ -121,6 +122,10 @@ public class ConfigurationModelToDDMFormConverter {
 		setDDMFormFieldPredefinedValue(attributeDefinition, ddmFormField);
 		setDDMFormFieldRequired(attributeDefinition, ddmFormField, required);
 		setDDMFormFieldTip(attributeDefinition, ddmFormField);
+
+		if (Validator.equals(ddmFormField.getDataType(), "string")) {
+			ddmFormField.setProperty("displayStyle", "multiline");
+		}
 
 		ddmFormField.setLocalizable(true);
 		ddmFormField.setShowLabel(true);
