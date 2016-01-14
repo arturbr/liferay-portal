@@ -26,6 +26,7 @@ import com.liferay.portal.search.elasticsearch.index.IndexFactory;
 import com.liferay.portal.search.elasticsearch.internal.util.LogUtil;
 import com.liferay.portal.search.elasticsearch.settings.IndexSettingsContributor;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.HashMap;
@@ -39,6 +40,8 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequestBuilder;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.settings.Settings;
@@ -77,16 +80,10 @@ public class CompanyIndexFactory implements IndexFactory {
 			return;
 		}
 
-		CreateIndexRequestBuilder createIndexRequestBuilder =
-			indicesAdminClient.prepareCreate(String.valueOf(companyId));
+		createIndex(companyId, indicesAdminClient);
 
-		addMappings(createIndexRequestBuilder);
-		setSettings(createIndexRequestBuilder);
+		putCustomMapping(companyId, indicesAdminClient);
 
-		CreateIndexResponse createIndexResponse =
-			createIndexRequestBuilder.get();
-
-		LogUtil.logActionResponse(_log, createIndexResponse);
 	}
 
 	@Override
@@ -134,13 +131,15 @@ public class CompanyIndexFactory implements IndexFactory {
 
 	@Activate
 	@Modified
-	protected void activate(Map<String, Object> properties) {
+	protected void activate(Map<String, Object> properties) throws IOException {
 		ElasticsearchConfiguration elasticsearchConfiguration =
 			Configurable.createConfigurable(
 				ElasticsearchConfiguration.class, properties);
 
 		setAdditionalIndexConfigurations(
 			elasticsearchConfiguration.additionalIndexConfigurations());
+		setAdditionalTypeMappings(
+			elasticsearchConfiguration.additionalTypeMappings());
 		setIndexConfigFileName(
 			MapUtil.getString(properties, "indexConfigFileName"));
 
@@ -162,7 +161,7 @@ public class CompanyIndexFactory implements IndexFactory {
 
 	protected void addMappings(
 			CreateIndexRequestBuilder createIndexRequestBuilder)
-		throws Exception {
+		throws IOException {
 
 		for (Map.Entry<String, String> entry : _typeMappings.entrySet()) {
 			Class<?> clazz = getClass();
@@ -172,6 +171,22 @@ public class CompanyIndexFactory implements IndexFactory {
 
 			createIndexRequestBuilder.addMapping(entry.getKey(), typeMapping);
 		}
+	}
+
+	protected void createIndex(
+			long companyId, IndicesAdminClient indicesAdminClient)
+		throws IOException {
+
+		CreateIndexRequestBuilder createIndexRequestBuilder =
+			indicesAdminClient.prepareCreate(String.valueOf(companyId));
+
+		addMappings(createIndexRequestBuilder);
+		setSettings(createIndexRequestBuilder);
+
+		CreateIndexResponse createIndexResponse =
+			createIndexRequestBuilder.get();
+
+		LogUtil.logActionResponse(_log, createIndexResponse);
 	}
 
 	protected boolean hasIndex(
@@ -218,6 +233,34 @@ public class CompanyIndexFactory implements IndexFactory {
 		}
 	}
 
+	protected void putCustomMapping(
+			long companyId, IndicesAdminClient indicesAdminClient)
+		throws IOException {
+
+		if (_additionalTypeMappings == null) {
+			return;
+		}
+
+		putMappingSource(
+			companyId, indicesAdminClient, _additionalTypeMappings);
+	}
+
+	protected void putMappingSource(
+			long companyId, IndicesAdminClient indicesAdminClient,
+			String source)
+		throws IOException {
+
+		PutMappingRequestBuilder putMappingRequestBuilder =
+			indicesAdminClient.preparePutMapping(String.valueOf(companyId));
+
+		putMappingRequestBuilder.setSource(source);
+		putMappingRequestBuilder.setType(LiferayTypeMappingsConstants.TYPE);
+
+		PutMappingResponse putMappingResponse = putMappingRequestBuilder.get();
+
+		LogUtil.logActionResponse(_log, putMappingResponse);
+	}
+
 	protected void removeIndexSettingsContributor(
 		IndexSettingsContributor indexSettingsContributor) {
 
@@ -230,13 +273,16 @@ public class CompanyIndexFactory implements IndexFactory {
 		_additionalIndexConfigurations = additionalIndexConfigurations;
 	}
 
+	protected void setAdditionalTypeMappings(String additionalTypeMappings) {
+		_additionalTypeMappings = additionalTypeMappings;
+	}
+
 	protected void setSettings(
 		CreateIndexRequestBuilder createIndexRequestBuilder) {
 
 		Settings.Builder builder = Settings.settingsBuilder();
 
 		loadIndexConfigFile(builder);
-
 		loadAdditionalIndexConfigurations(builder);
 
 		loadIndexSettingsContributors(builder);
@@ -250,6 +296,7 @@ public class CompanyIndexFactory implements IndexFactory {
 		CompanyIndexFactory.class);
 
 	private volatile String _additionalIndexConfigurations;
+	private String _additionalTypeMappings;
 	private String _indexConfigFileName;
 	private final Set<IndexSettingsContributor> _indexSettingsContributors =
 		new ConcurrentSkipListSet<>();
