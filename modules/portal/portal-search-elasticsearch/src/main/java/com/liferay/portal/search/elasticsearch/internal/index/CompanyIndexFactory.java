@@ -84,6 +84,7 @@ public class CompanyIndexFactory implements IndexFactory {
 
 		putCustomMapping(companyId, indicesAdminClient);
 
+		putMappingEnding(companyId, indicesAdminClient);
 	}
 
 	@Override
@@ -164,10 +165,10 @@ public class CompanyIndexFactory implements IndexFactory {
 		throws IOException {
 
 		for (Map.Entry<String, String> entry : _typeMappings.entrySet()) {
-			Class<?> clazz = getClass();
+			InputStream inputStream = getClass().getResourceAsStream(
+				entry.getValue());
 
-			String typeMapping = StringUtil.read(
-				clazz.getClassLoader(), entry.getValue());
+			String typeMapping = StringUtil.read(inputStream);
 
 			createIndexRequestBuilder.addMapping(entry.getKey(), typeMapping);
 		}
@@ -243,6 +244,18 @@ public class CompanyIndexFactory implements IndexFactory {
 
 		putMappingSource(
 			companyId, indicesAdminClient, _additionalTypeMappings);
+	}
+
+	protected void putMappingEnding(
+			long companyId, IndicesAdminClient indicesAdminClient)
+		throws IOException {
+
+		InputStream inputStream = getClass().getResourceAsStream(
+			LiferayTypeMappingsConstants.FILE_ENDING);
+
+		String typeMapping = StringUtil.read(inputStream);
+
+		putMappingSource(companyId, indicesAdminClient, typeMapping);
 	}
 
 	protected void putMappingSource(

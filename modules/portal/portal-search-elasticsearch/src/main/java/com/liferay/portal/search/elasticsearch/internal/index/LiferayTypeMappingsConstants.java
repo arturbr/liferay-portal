@@ -22,6 +22,9 @@ public class LiferayTypeMappingsConstants {
 	public static final String FILE =
 		"/META-INF/mappings/liferay-type-mappings.json";
 
+	public static final String FILE_ENDING =
+		"/META-INF/mappings/liferay-type-mappings-ending.json";
+
 	public static final String TYPE = "LiferayDocumentType";
 
 }
