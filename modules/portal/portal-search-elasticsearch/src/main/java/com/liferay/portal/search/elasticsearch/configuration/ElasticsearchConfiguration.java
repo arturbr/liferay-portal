@@ -60,8 +60,11 @@ public interface ElasticsearchConfiguration {
 	@Meta.AD(deflt = "/https?:\\/\\/localhost(:[0-9]+)?/", required = false)
 	public String httpCORSAllowOrigin();
 
-	@Meta.AD(deflt = "", required = false)
-	public String[] httpCORSConfigurations();
+	@Meta.AD(
+		description = "Custom settings for HTTP CORS, in YML format (elasticsearch.yml)",
+		required = false
+	)
+	public String httpCORSConfigurations();
 
 	@Meta.AD(deflt = "true", required = false)
 	public boolean httpCORSEnabled();
