@@ -30,8 +30,11 @@ import com.liferay.portal.search.elasticsearch.connection.OperationMode;
 )
 public interface ElasticsearchConfiguration {
 
-	@Meta.AD(deflt = "", required = false)
-	public String[] additionalConfigurations();
+	@Meta.AD(
+		description = "Custom node settings in YML format (as seen in elasticsearch.yml)",
+		required = false
+	)
+	public String additionalConfigurations();
 
 	@Meta.AD(deflt = "", required = false)
 	public String[] additionalIndexConfigurations();
