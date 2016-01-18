@@ -63,8 +63,6 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 	configurationPid = "com.liferay.portal.search.elasticsearch.configuration.ElasticsearchConfiguration",
 	immediate = true,
 	property = {
-		"indexConfigFileName=" + IndexSettingsConstants.FILE,
-		"typeMappings." + LiferayTypeMappingsConstants.TYPE + "=" + LiferayTypeMappingsConstants.FILE,
 		"typeMappings.KeywordQueryDocumentType=/META-INF/mappings/keyword-query-type-mappings.json",
 		"typeMappings.SpellCheckDocumentType=/META-INF/mappings/spellcheck-type-mappings.json"
 	}
@@ -81,9 +79,13 @@ public class CompanyIndexFactory implements IndexFactory {
 			return;
 		}
 
-		createIndex(companyId, indicesAdminClient);
+		LiferayDocumentTypeFactory liferayDocumentTypeFactory =
+			new LiferayDocumentTypeFactory(
+				String.valueOf(companyId), indicesAdminClient);
 
-		updateLiferayDocumentType(companyId, indicesAdminClient);
+		createIndex(companyId, indicesAdminClient, liferayDocumentTypeFactory);
+
+		updateLiferayDocumentType(liferayDocumentTypeFactory);
 	}
 
 	@Override
@@ -105,12 +107,76 @@ public class CompanyIndexFactory implements IndexFactory {
 		LogUtil.logActionResponse(_log, deleteIndexResponse);
 	}
 
-	public void setIndexConfigFileName(String indexConfigFileName) {
-		_indexConfigFileName = indexConfigFileName;
-	}
-
 	public void setTypeMappings(Map<String, String> typeMappings) {
 		_typeMappings = typeMappings;
+	}
+
+	public static class LiferayDocumentTypeFactory
+		implements TypeMappingsHelper {
+
+		public LiferayDocumentTypeFactory(
+			String indexName, IndicesAdminClient indicesAdminClient) {
+
+			_indexName = indexName;
+			_indicesAdminClient = indicesAdminClient;
+		}
+
+		@Override
+		public void addTypeMappings(String source) {
+			PutMappingRequestBuilder putMappingRequestBuilder =
+				_indicesAdminClient.preparePutMapping(_indexName);
+
+			putMappingRequestBuilder.setSource(source);
+			putMappingRequestBuilder.setType(LiferayTypeMappingsConstants.TYPE);
+
+			PutMappingResponse putMappingResponse =
+				putMappingRequestBuilder.get();
+
+			try {
+				LogUtil.logActionResponse(_log, putMappingResponse);
+			}
+			catch (IOException ioe) {
+				throw new RuntimeException(ioe);
+			}
+		}
+
+		public void createOptionalDefaultTypeMappings() {
+			String name = StringUtil.replace(
+				LiferayTypeMappingsConstants.FILE, ".json",
+				"-optional-defaults.json");
+
+			addTypeMappings(_read(name));
+		}
+
+		public void createRequiredDefaultAnalyzers(Settings.Builder builder) {
+			builder.loadFromSource(_read(IndexSettingsConstants.FILE));
+		}
+
+		public void createRequiredDefaultTypeMappings(
+			CreateIndexRequestBuilder createIndexRequestBuilder) {
+
+			createIndexRequestBuilder.addMapping(
+				LiferayTypeMappingsConstants.TYPE,
+				_read(LiferayTypeMappingsConstants.FILE));
+		}
+
+		private String _read(String name) {
+			Class<?> clazz = getClass();
+
+			try (InputStream inputStream = clazz.getResourceAsStream(name)) {
+				return StringUtil.read(inputStream);
+			}
+			catch (IOException ioe) {
+				throw new RuntimeException(ioe);
+			}
+		}
+
+		private static final Log _log = LogFactoryUtil.getLog(
+			LiferayDocumentTypeFactory.class);
+
+		private final String _indexName;
+		private final IndicesAdminClient _indicesAdminClient;
+
 	}
 
 	protected static Map<String, String> getTypeMappings(
@@ -140,8 +206,6 @@ public class CompanyIndexFactory implements IndexFactory {
 			elasticsearchConfiguration.additionalIndexConfigurations());
 		setAdditionalTypeMappings(
 			elasticsearchConfiguration.additionalTypeMappings());
-		setIndexConfigFileName(
-			MapUtil.getString(properties, "indexConfigFileName"));
 
 		Map<String, String> typeMappings = getTypeMappings(properties);
 
@@ -170,14 +234,18 @@ public class CompanyIndexFactory implements IndexFactory {
 	}
 
 	protected void createIndex(
-			long companyId, IndicesAdminClient indicesAdminClient)
+			long companyId, IndicesAdminClient indicesAdminClient,
+			LiferayDocumentTypeFactory liferayDocumentTypeFactory)
 		throws Exception {
 
 		CreateIndexRequestBuilder createIndexRequestBuilder =
 			indicesAdminClient.prepareCreate(String.valueOf(companyId));
 
 		addMappings(createIndexRequestBuilder);
-		setSettings(createIndexRequestBuilder);
+		setSettings(createIndexRequestBuilder, liferayDocumentTypeFactory);
+
+		liferayDocumentTypeFactory.createRequiredDefaultTypeMappings(
+			createIndexRequestBuilder);
 
 		CreateIndexResponse createIndexResponse =
 			createIndexRequestBuilder.get();
@@ -207,29 +275,13 @@ public class CompanyIndexFactory implements IndexFactory {
 	}
 
 	protected void loadAdditionalTypeMappings(
-			long companyId, IndicesAdminClient indicesAdminClient)
-		throws IOException {
+		LiferayDocumentTypeFactory liferayDocumentTypeFactory) {
 
 		if (_additionalTypeMappings == null) {
 			return;
 		}
 
-		putMapping(companyId, _additionalTypeMappings, indicesAdminClient);
-	}
-
-	protected void loadIndexConfigFile(Settings.Builder builder) {
-		if (Validator.isNull(_indexConfigFileName)) {
-			return;
-		}
-
-		Class<?> clazz = getClass();
-
-		ClassLoader classLoader = clazz.getClassLoader();
-
-		InputStream inputStream = classLoader.getResourceAsStream(
-			_indexConfigFileName);
-
-		builder.loadFromStream(_indexConfigFileName, inputStream);
+		liferayDocumentTypeFactory.addTypeMappings(_additionalTypeMappings);
 	}
 
 	protected void loadIndexSettingsContributors(Settings.Builder builder) {
@@ -240,55 +292,14 @@ public class CompanyIndexFactory implements IndexFactory {
 		}
 	}
 
-	protected void loadOptionalDefaultTypeMappings(
-			long companyId, IndicesAdminClient indicesAdminClient)
-		throws IOException {
-
-		String name = StringUtil.replace(
-			LiferayTypeMappingsConstants.FILE, ".json",
-			"-optional-defaults.json");
-
-		putMapping(companyId, read(name), indicesAdminClient);
-	}
-
 	protected void loadTypeMappingsContributors(
-		final long companyId, final IndicesAdminClient indicesAdminClient) {
-
-		TypeMappingsHelper typeMappingsHelper = new TypeMappingsHelper() {
-
-			@Override
-			public void addTypeMappings(String source) {
-				try {
-					putMapping(companyId, source, indicesAdminClient);
-				}
-				catch (IOException ioe) {
-					throw new RuntimeException(ioe);
-				}
-			}
-
-		};
+		LiferayDocumentTypeFactory liferayDocumentTypeFactory) {
 
 		for (IndexSettingsContributor indexSettingsContributor :
 				_indexSettingsContributors) {
 
-			indexSettingsContributor.contribute(typeMappingsHelper);
+			indexSettingsContributor.contribute(liferayDocumentTypeFactory);
 		}
-	}
-
-	protected void putMapping(
-			long companyId, String source,
-			IndicesAdminClient indicesAdminClient)
-		throws IOException {
-
-		PutMappingRequestBuilder putMappingRequestBuilder =
-			indicesAdminClient.preparePutMapping(String.valueOf(companyId));
-
-		putMappingRequestBuilder.setSource(source);
-		putMappingRequestBuilder.setType(LiferayTypeMappingsConstants.TYPE);
-
-		PutMappingResponse putMappingResponse = putMappingRequestBuilder.get();
-
-		LogUtil.logActionResponse(_log, putMappingResponse);
 	}
 
 	protected String read(String name) throws IOException {
@@ -316,11 +327,12 @@ public class CompanyIndexFactory implements IndexFactory {
 	}
 
 	protected void setSettings(
-		CreateIndexRequestBuilder createIndexRequestBuilder) {
+		CreateIndexRequestBuilder createIndexRequestBuilder,
+		LiferayDocumentTypeFactory liferayDocumentTypeFactory) {
 
 		Settings.Builder builder = Settings.settingsBuilder();
 
-		loadIndexConfigFile(builder);
+		liferayDocumentTypeFactory.createRequiredDefaultAnalyzers(builder);
 
 		loadAdditionalIndexConfigurations(builder);
 
@@ -330,18 +342,13 @@ public class CompanyIndexFactory implements IndexFactory {
 	}
 
 	protected void updateLiferayDocumentType(
-			long companyId, IndicesAdminClient indicesAdminClient)
-		throws IOException {
+		LiferayDocumentTypeFactory liferayDocumentTypeFactory) {
 
-		if (!_typeMappings.containsKey(LiferayTypeMappingsConstants.TYPE)) {
-			return;
-		}
+		loadAdditionalTypeMappings(liferayDocumentTypeFactory);
 
-		loadAdditionalTypeMappings(companyId, indicesAdminClient);
+		loadTypeMappingsContributors(liferayDocumentTypeFactory);
 
-		loadTypeMappingsContributors(companyId, indicesAdminClient);
-
-		loadOptionalDefaultTypeMappings(companyId, indicesAdminClient);
+		liferayDocumentTypeFactory.createOptionalDefaultTypeMappings();
 	}
 
 	private static final String _PREFIX = "typeMappings.";
@@ -351,7 +358,6 @@ public class CompanyIndexFactory implements IndexFactory {
 
 	private volatile String _additionalIndexConfigurations;
 	private String _additionalTypeMappings;
-	private String _indexConfigFileName;
 	private final Set<IndexSettingsContributor> _indexSettingsContributors =
 		new ConcurrentSkipListSet<>();
 	private Map<String, String> _typeMappings = new HashMap<>();
