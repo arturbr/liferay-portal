@@ -17,34 +17,8 @@ package com.liferay.portal.search.elasticsearch.settings;
 /**
  * @author André de Oliveira
  */
-public abstract class BaseIndexSettingsContributor
-	implements IndexSettingsContributor {
+public interface TypeMappingsHelper {
 
-	public BaseIndexSettingsContributor(int priority) {
-		_priority = priority;
-	}
-
-	@Override
-	public int compareTo(IndexSettingsContributor indexSettingsContributor) {
-		if (_priority > indexSettingsContributor.getPriority()) {
-			return 1;
-		}
-		else if (_priority == indexSettingsContributor.getPriority()) {
-			return 0;
-		}
-
-		return -1;
-	}
-
-	@Override
-	public void contribute(TypeMappingsHelper putMapping) {
-	}
-
-	@Override
-	public int getPriority() {
-		return _priority;
-	}
-
-	private final int _priority;
+	public void addTypeMappings(String source);
 
 }
