@@ -15,6 +15,7 @@
 package com.liferay.portal.search.elasticsearch.internal.index;
 
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.elasticsearch.internal.cluster.TestCluster;
 import com.liferay.portal.search.elasticsearch.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.search.elasticsearch.settings.BaseIndexSettingsContributor;
@@ -22,7 +23,9 @@ import com.liferay.portal.search.elasticsearch.settings.BaseIndexSettingsContrib
 import java.util.HashMap;
 
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
+import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.AdminClient;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.settings.Settings.Builder;
@@ -65,6 +68,38 @@ public class CompanyIndexFactoryTest {
 
 		Assert.assertEquals("1", settings.get("index.number_of_replicas"));
 		Assert.assertEquals("2", settings.get("index.number_of_shards"));
+	}
+
+	@Test
+	public void testAdditionalTypeMappings() throws Exception {
+		Class<?> clazz = getClass();
+
+		ClassLoader classLoader = clazz.getClassLoader();
+
+		String customTypeMappings = StringUtil.read(
+			classLoader,
+			"com/liferay/portal/search/elasticsearch/internal/index/" +
+				"custom-type-mappings.json");
+
+		_companyIndexFactory.setAdditionalTypeMappings(customTypeMappings);
+
+		createIndex();
+
+		Client client = _elasticsearchFixture.getClient();
+		AdminClient adminClient = _elasticsearchFixture.getAdminClient();
+
+		IndexRequestBuilder indexRequestBuilder = client.prepareIndex(
+			String.valueOf(_COMPANY_ID), LiferayTypeMappingsConstants.TYPE);
+
+		String field = RandomTestUtil.randomString() + "_xpto";
+
+		indexRequestBuilder.setSource(field, RandomTestUtil.randomString());
+
+		indexRequestBuilder.get();
+
+		AnalyzerUtil analyzerUtil = new AnalyzerUtil(adminClient, _COMPANY_ID);
+
+		analyzerUtil.assertAnalyzer(field, "italian");
 	}
 
 	@Test

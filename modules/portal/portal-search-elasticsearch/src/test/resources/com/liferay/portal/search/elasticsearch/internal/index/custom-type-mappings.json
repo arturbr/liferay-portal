@@ -1,0 +1,13 @@
+{
+	"dynamic_templates": [
+	{
+		"template_xpto": {
+			"mapping": {
+				"index": "analyzed",
+				"analyzer": "italian"
+			},
+			"match": "\\w+_xpto\\b",
+			"match_pattern": "regex"
+		}
+	}]
+}
