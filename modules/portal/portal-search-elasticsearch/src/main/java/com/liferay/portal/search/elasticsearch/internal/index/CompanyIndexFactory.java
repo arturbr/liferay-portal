@@ -25,7 +25,6 @@ import com.liferay.portal.search.elasticsearch.configuration.ElasticsearchConfig
 import com.liferay.portal.search.elasticsearch.index.IndexFactory;
 import com.liferay.portal.search.elasticsearch.internal.util.LogUtil;
 import com.liferay.portal.search.elasticsearch.settings.IndexSettingsContributor;
-import com.liferay.portal.search.elasticsearch.settings.TypeMappingsHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,8 +40,6 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequestBuilder;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.settings.Settings;
@@ -109,74 +106,6 @@ public class CompanyIndexFactory implements IndexFactory {
 
 	public void setTypeMappings(Map<String, String> typeMappings) {
 		_typeMappings = typeMappings;
-	}
-
-	public static class LiferayDocumentTypeFactory
-		implements TypeMappingsHelper {
-
-		public LiferayDocumentTypeFactory(
-			String indexName, IndicesAdminClient indicesAdminClient) {
-
-			_indexName = indexName;
-			_indicesAdminClient = indicesAdminClient;
-		}
-
-		@Override
-		public void addTypeMappings(String source) {
-			PutMappingRequestBuilder putMappingRequestBuilder =
-				_indicesAdminClient.preparePutMapping(_indexName);
-
-			putMappingRequestBuilder.setSource(source);
-			putMappingRequestBuilder.setType(LiferayTypeMappingsConstants.TYPE);
-
-			PutMappingResponse putMappingResponse =
-				putMappingRequestBuilder.get();
-
-			try {
-				LogUtil.logActionResponse(_log, putMappingResponse);
-			}
-			catch (IOException ioe) {
-				throw new RuntimeException(ioe);
-			}
-		}
-
-		public void createOptionalDefaultTypeMappings() {
-			String name = StringUtil.replace(
-				LiferayTypeMappingsConstants.FILE, ".json",
-				"-optional-defaults.json");
-
-			addTypeMappings(_read(name));
-		}
-
-		public void createRequiredDefaultAnalyzers(Settings.Builder builder) {
-			builder.loadFromSource(_read(IndexSettingsConstants.FILE));
-		}
-
-		public void createRequiredDefaultTypeMappings(
-			CreateIndexRequestBuilder createIndexRequestBuilder) {
-
-			createIndexRequestBuilder.addMapping(
-				LiferayTypeMappingsConstants.TYPE,
-				_read(LiferayTypeMappingsConstants.FILE));
-		}
-
-		private String _read(String name) {
-			Class<?> clazz = getClass();
-
-			try (InputStream inputStream = clazz.getResourceAsStream(name)) {
-				return StringUtil.read(inputStream);
-			}
-			catch (IOException ioe) {
-				throw new RuntimeException(ioe);
-			}
-		}
-
-		private static final Log _log = LogFactoryUtil.getLog(
-			LiferayDocumentTypeFactory.class);
-
-		private final String _indexName;
-		private final IndicesAdminClient _indicesAdminClient;
-
 	}
 
 	protected static Map<String, String> getTypeMappings(
