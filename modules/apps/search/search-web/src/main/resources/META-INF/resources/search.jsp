@@ -16,6 +16,9 @@ search.jsp
  */
 --%>
 
+<%@page import="com.liferay.search.web.display.context.SearchDisplayContext"%>
+<%@page import="com.liferay.search.web.constants.SearchPortletParams"%>
+
 <%@ include file="/init.jsp" %>
 
 <%
@@ -25,11 +28,15 @@ if (Validator.isNotNull(redirect)) {
 	portletDisplay.setURLBack(redirect);
 }
 
-long groupId = ParamUtil.getLong(request, "groupId");
+long groupId = ParamUtil.getLong(request, SearchPortletParams.GROUP_ID);
 
-String keywords = ParamUtil.getString(request, "keywords");
+String keywords = ParamUtil.getString(request, SearchPortletParams.KEYWORDS);
 
-String format = ParamUtil.getString(request, "format");
+String format = ParamUtil.getString(request, SearchPortletParams.FORMAT);
+
+String scopeParam = ParamUtil.getString(request, SearchPortletParams.SCOPE);
+
+SearchDisplayContext.Scope scope = searchDisplayContext.getScope(scopeParam);
 
 PortletURL portletURL = PortletURLUtil.getCurrent(renderRequest, renderResponse);
 
@@ -49,10 +56,11 @@ request.setAttribute("search.jsp-returnToFullPageURL", portletDisplay.getURLBack
 <aui:form action="<%= searchURL %>" method="get" name="fm" onSubmit="event.preventDefault();">
 	<liferay-portlet:renderURLParams varImpl="searchURL" />
 	<aui:input name="<%= SearchContainer.DEFAULT_CUR_PARAM %>" type="hidden" value="<%= ParamUtil.getInteger(request, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_CUR) %>" />
-	<aui:input name="format" type="hidden" value="<%= format %>" />
+	<aui:input name="<%= SearchPortletParams.FORMAT %>" type="hidden" value="<%= format %>" />
 
 	<aui:fieldset id="searchContainer">
-		<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" inlineField="<%= true %>" label="" name="keywords" size="30" title="search" value="<%= HtmlUtil.escape(keywords) %>" />
+		<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" inlineField="<%= true %>" label="" name="<%= SearchPortletParams.KEYWORDS %>" size="30" title="search" value="<%= HtmlUtil.escape(keywords) %>" />
+		<aui:input name='<%= SearchPortletParams.SCOPE %>' type="hidden" value="<%= scope.getScopeString() %>" />
 
 		<aui:field-wrapper inlineField="<%= true %>">
 			<aui:button icon="icon-search" onClick='<%= renderResponse.getNamespace() + "search();" %>' value="search" />

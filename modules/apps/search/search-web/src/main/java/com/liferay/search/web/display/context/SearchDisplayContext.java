@@ -22,15 +22,17 @@ import com.liferay.portal.kernel.util.PredicateFilter;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.search.facet.SearchFacet;
 import com.liferay.search.facet.util.SearchFacetTracker;
+import com.liferay.search.web.constants.SearchPortletKeys;
+import com.liferay.search.web.constants.SearchPortletParams;
 
 import java.util.List;
 
 import javax.portlet.PortletPreferences;
-
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -46,8 +48,7 @@ public class SearchDisplayContext {
 	}
 
 	public String checkViewURL(String viewURL, String currentURL) {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay = getThemeDisplay();
 
 		if (Validator.isNotNull(viewURL) &&
 			viewURL.startsWith(themeDisplay.getURLPortal())) {
@@ -82,6 +83,10 @@ public class SearchDisplayContext {
 		}
 
 		return _collatedSpellCheckResultDisplayThreshold;
+	}
+
+	public Preferences getPreferences() {
+		return _preferences;
 	}
 
 	public List<SearchFacet> getEnabledSearchFacets() {
@@ -155,6 +160,14 @@ public class SearchDisplayContext {
 		return _querySuggestionsMax;
 	}
 
+	public Scope getScope(String scopeString) {
+		if (Validator.isBlank(scopeString)) {
+			return new Scope(getSearchScope());
+		}
+
+		return new Scope(scopeString);
+	}
+
 	public String getSearchConfiguration() {
 		if (_searchConfiguration != null) {
 			return _searchConfiguration;
@@ -172,7 +185,7 @@ public class SearchDisplayContext {
 		}
 
 		_searchScope = _portletPreferences.getValue(
-			"searchScope", StringPool.BLANK);
+			"searchScope", SearchPortletParams.THIS_SITE);
 
 		return _searchScope;
 	}
@@ -222,8 +235,7 @@ public class SearchDisplayContext {
 			return _displayResultsInDocumentForm;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay = getThemeDisplay();
 
 		_displayResultsInDocumentForm = GetterUtil.getBoolean(
 			_portletPreferences.getValue("displayResultsInDocumentForm", null));
@@ -303,8 +315,13 @@ public class SearchDisplayContext {
 		return _viewInContext;
 	}
 
+	protected ThemeDisplay getThemeDisplay() {
+		return (ThemeDisplay)_request.getAttribute(WebKeys.THEME_DISPLAY);
+	}
+
 	private Integer _collatedSpellCheckResultDisplayThreshold;
 	private Boolean _collatedSpellCheckResultEnabled;
+	private final Preferences _preferences = new Preferences();
 	private Boolean _displayMainQuery;
 	private Boolean _displayOpenSearchResults;
 	private Boolean _displayResultsInDocumentForm;
@@ -321,5 +338,60 @@ public class SearchDisplayContext {
 	private String _searchConfiguration;
 	private String _searchScope;
 	private Boolean _viewInContext;
+
+
+	public class Preferences {
+
+		public boolean isSearchScope(String scope) {
+			if (Validator.equals(getSearchScope(), scope)) {
+				return true;
+			}
+
+			return false;
+		}
+
+		public boolean isSearchScopeEverythingAvailable() {
+			ThemeDisplay themeDisplay = getThemeDisplay();
+
+			Group group = themeDisplay.getScopeGroup();
+
+			if (group.isStagingGroup()) {
+				return false;
+			}
+
+			return true;
+		}
+
+		public boolean isSearchScopeLetTheUserChoose() {
+			return isSearchScope("let-the-user-choose");
+		}
+
+	}
+
+	public class Scope {
+
+		public String getScopeString() {
+			return _scopeString;
+		}
+
+		public boolean isEverything() {
+			return isSearchScope(SearchPortletParams.EVERYTHING);
+		}
+
+		public boolean isSearchScope(String scope) {
+			if (Validator.equals(_scopeString, scope)) {
+				return true;
+			}
+
+			return false;
+		}
+
+		protected Scope(String scopeString) {
+			_scopeString = scopeString;
+		}
+
+		private final String _scopeString;
+
+	}
 
 }

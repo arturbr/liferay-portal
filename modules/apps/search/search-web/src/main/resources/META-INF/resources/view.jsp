@@ -16,12 +16,23 @@ view.jsp
  */
 --%>
 
+<%@page import="com.liferay.search.web.display.context.SearchDisplayContext"%>
+<%@page import="com.liferay.search.web.constants.SearchPortletParams"%>
+
 <%@ include file="/init.jsp" %>
 
 <%
-long groupId = ParamUtil.getLong(request, "groupId");
+SearchDisplayContext.Preferences preferences = searchDisplayContext.getPreferences();
 
-String keywords = ParamUtil.getString(request, "keywords");
+long groupId = ParamUtil.getLong(request, SearchPortletParams.GROUP_ID);
+
+boolean groupIdRequested = (groupId != 0);
+		 
+String keywords = ParamUtil.getString(request, SearchPortletParams.KEYWORDS);
+
+String scopeParam = ParamUtil.getString(request, SearchPortletParams.SCOPE);
+
+SearchDisplayContext.Scope scope = searchDisplayContext.getScope(scopeParam);
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
@@ -37,7 +48,7 @@ pageContext.setAttribute("portletURL", portletURL);
 	<liferay-portlet:renderURLParams varImpl="portletURL" />
 
 	<aui:fieldset>
-		<aui:input cssClass="search-input" inlineField="<%= true %>" label="" name="keywords" placeholder="search" size="30" title="search" type="text" value="<%= HtmlUtil.escapeAttribute(keywords) %>" />
+		<aui:input cssClass="search-input" inlineField="<%= true %>" label="" name="<%= SearchPortletParams.KEYWORDS %>" placeholder="search" size="30" title="search" type="text" value="<%= HtmlUtil.escapeAttribute(keywords) %>" />
 
 		<%
 		String taglibOnClick = "Liferay.Util.focusFormField('#" + renderResponse.getNamespace() + "keywords');";
@@ -46,25 +57,17 @@ pageContext.setAttribute("portletURL", portletURL);
 		<liferay-ui:quick-access-entry label="skip-to-search" onClick="<%= taglibOnClick %>" />
 
 		<c:choose>
-			<c:when test='<%= Validator.equals(searchDisplayContext.getSearchScope(), "let-the-user-choose") %>'>
-				<aui:select cssClass="search-select" inlineField="<%= true %>" label="" name="groupId" title="scope">
-
-					<%
-					Group group = themeDisplay.getScopeGroup();
-					%>
-
-					<c:if test="<%= !group.isStagingGroup() %>">
-						<aui:option label="everything" selected="<%= (groupId == 0) %>" value="0" />
+			<c:when test='<%= preferences.isSearchScopeLetTheUserChoose() %>'>
+				<aui:select cssClass="search-select" inlineField="<%= true %>" label="" name="<%= SearchPortletParams.SCOPE %>" title="scope">
+					<c:if test="<%= preferences.isSearchScopeEverythingAvailable() %>">
+						<aui:option label="everything" selected="<%= !groupIdRequested %>" value="<%= SearchPortletParams.EVERYTHING %>" />
 					</c:if>
 
-					<aui:option label="this-site" selected="<%= (groupId != 0) %>" value="<%= group.getGroupId() %>" />
+					<aui:option label="this-site" selected="<%= groupIdRequested %>" value="<%= SearchPortletParams.THIS_SITE %>" />
 				</aui:select>
 			</c:when>
-			<c:when test='<%= Validator.equals(searchDisplayContext.getSearchScope(), "everything") %>'>
-				<aui:input name="groupId" type="hidden" value="0" />
-			</c:when>
 			<c:otherwise>
-				<aui:input name="groupId" type="hidden" value="<%= themeDisplay.getScopeGroupId() %>" />
+				<aui:input name="<%= SearchPortletParams.SCOPE %>" type="hidden" value="<%= scope.getScopeString() %>" />
 			</c:otherwise>
 		</c:choose>
 
