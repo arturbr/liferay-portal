@@ -1,3 +1,5 @@
+scopes.jsp
+
 <%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
@@ -19,9 +21,9 @@
 <%
 if (termCollectors.isEmpty()) {
 %>
-
+HI MOM!
 	<aui:input name="<%= HtmlUtil.escapeAttribute(facet.getFieldName()) %>" type="hidden" value="<%= fieldParam %>" />
-
+HI MOM!
 <%
 	return;
 }
