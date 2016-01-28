@@ -103,7 +103,12 @@ public class ScopeFacet extends MultiValueFacet {
 		if (Validator.isNotNull(groupIdParam)) {
 			long groupId = GetterUtil.getLong(groupIdParam);
 
-			groupIds = addScopeGroup(groupId);
+			if (groupId == 0) {
+				groupIds = new long[] {0};
+			}
+			else {
+				groupIds = addScopeGroup(groupId);
+			}
 		}
 
 		if (ArrayUtil.isEmpty(groupIds) ||
