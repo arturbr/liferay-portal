@@ -70,6 +70,25 @@ public class SearchContextFactory {
 			}
 		}
 
+		String GROUP_ID = "groupId";
+		String SCOPE = "scope";
+		String EVERYTHING = "evething";
+
+		String groupId = "0";
+
+		if(parameters.containsKey(GROUP_ID)){
+			groupId = parameters.get(GROUP_ID)[0];
+		} else {
+			String groupScope = parameters.get(SCOPE)[0];
+			if(EVERYTHING.equals(groupScope)) {
+				groupId = "0";
+			} else {
+				groupId = String.valueOf(themeDisplay.getScopeGroupId());
+			}
+		}
+
+		attributes.put(GROUP_ID, groupId);
+
 		searchContext.setAttributes(attributes);
 
 		// Asset
