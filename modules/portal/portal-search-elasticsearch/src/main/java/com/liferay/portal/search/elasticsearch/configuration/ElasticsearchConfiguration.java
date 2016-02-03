@@ -59,7 +59,10 @@ public interface ElasticsearchConfiguration {
 	@Meta.AD(deflt = "9300-9400", required = false)
 	public String discoveryZenPingUnicastHostsPort();
 
-	@Meta.AD(deflt = "/https?:\\/\\/localhost(:[0-9]+)?/", required = false)
+	@Meta.AD(
+		deflt = "/https?:\\/\\/(localhost|127\\.0\\.0\\.1)(:[0-9]+)?/",
+		required = false
+	)
 	public String httpCORSAllowOrigin();
 
 	@Meta.AD(description = "%http-cors-configurations-help", required = false)
