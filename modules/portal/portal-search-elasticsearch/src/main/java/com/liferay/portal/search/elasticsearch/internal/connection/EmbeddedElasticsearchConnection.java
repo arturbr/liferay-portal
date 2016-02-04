@@ -49,7 +49,6 @@ import org.elasticsearch.common.settings.Settings.Builder;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
 import org.elasticsearch.plugins.PluginManager;
 
 import org.osgi.service.component.annotations.Activate;
@@ -181,11 +180,7 @@ public class EmbeddedElasticsearchConnection
 					elasticsearchConfiguration.clusterName());
 		}
 
-		NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder();
-
-		nodeBuilder.settings(builder);
-
-		_node = nodeBuilder.node();
+		_node = new Node(builder.build());
 
 		_node.start();
 
@@ -269,8 +264,8 @@ public class EmbeddedElasticsearchConnection
 				builder, "analysis-stempel-2.1.1.zip",
 				"liferay/analysis-stempel/2.1.1");
 		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
+		catch (IOException ioe) {
+			throw new RuntimeException(ioe);
 		}
 	}
 
