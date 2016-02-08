@@ -238,7 +238,8 @@ public class EmbeddedElasticsearchConnection
 
 			pluginManager.removePlugin(pluginName, Terminal.DEFAULT);
 
-			pluginManager.downloadAndExtract(pluginName, Terminal.DEFAULT);
+			pluginManager.downloadAndExtract(
+				pluginName, Terminal.DEFAULT, true);
 		} finally {
 			file.delete();
 		}
