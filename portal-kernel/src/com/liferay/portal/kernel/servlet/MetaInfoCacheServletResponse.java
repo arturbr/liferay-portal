@@ -149,11 +149,17 @@ public class MetaInfoCacheServletResponse extends HttpServletResponseWrapper {
 
 	@Override
 	public void addHeader(String name, String value) {
-		if (name.equals(HttpHeaders.CONTENT_TYPE)) {
+		if (name.equalsIgnoreCase(HttpHeaders.CONTENT_TYPE)) {
 			setContentType(value);
 
 			return;
 		}
+//		if (name.equalsIgnoreCase(HttpHeaders.CONTENT_ENCODING)) {
+//			value = "";
+//			setContentEncoding(value);
+//			super.addHeader(name, value);
+//			return;
+//		}
 
 		Set<Header> values = _metaData._headers.get(name);
 
@@ -234,6 +240,10 @@ public class MetaInfoCacheServletResponse extends HttpServletResponseWrapper {
 		}
 
 		return _metaData._charsetName;
+	}
+
+	public String getContentEncoding() {
+		return _metaData._contentEncoding;
 	}
 
 	@Override
@@ -345,6 +355,7 @@ public class MetaInfoCacheServletResponse extends HttpServletResponseWrapper {
 
 		_metaData._charsetName = null;
 		_metaData._contentLength = -1;
+		_metaData._contentEncoding = null;
 		_metaData._contentType = null;
 		_metaData._headers.clear();
 		_metaData._locale = null;
@@ -459,6 +470,14 @@ public class MetaInfoCacheServletResponse extends HttpServletResponseWrapper {
 		super.setContentLength(contentLength);
 	}
 
+	public void setContentEncoding(String contentEncoding) {
+		if (isCommitted() || contentEncoding == null) {
+			return;
+		}
+
+		_metaData._contentEncoding = contentEncoding;
+	}
+
 	@Override
 	public void setContentType(String contentType) {
 		if (isCommitted()) {
@@ -513,11 +532,17 @@ public class MetaInfoCacheServletResponse extends HttpServletResponseWrapper {
 
 	@Override
 	public void setHeader(String name, String value) {
-		if (name.equals(HttpHeaders.CONTENT_TYPE)) {
+		if (name.equalsIgnoreCase(HttpHeaders.CONTENT_TYPE)) {
 			setContentType(value);
 
 			return;
 		}
+//		if (name.equalsIgnoreCase(HttpHeaders.CONTENT_ENCODING)) {
+//			value = "";
+//			setContentEncoding(value);
+//			super.setHeader(name, value);
+//			return;
+//		}
 
 		Set<Header> values = new HashSet<>();
 
@@ -580,7 +605,7 @@ public class MetaInfoCacheServletResponse extends HttpServletResponseWrapper {
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(23);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("{bufferSize=");
 		sb.append(_metaData._bufferSize);
@@ -590,6 +615,8 @@ public class MetaInfoCacheServletResponse extends HttpServletResponseWrapper {
 		sb.append(_committed);
 		sb.append(", contentLength=");
 		sb.append(_metaData._contentLength);
+		sb.append(", contentEncoding=");
+		sb.append(_metaData._contentEncoding);
 		sb.append(", contentType=");
 		sb.append(_metaData._contentType);
 		sb.append(", error=");
@@ -614,6 +641,7 @@ public class MetaInfoCacheServletResponse extends HttpServletResponseWrapper {
 		private int _bufferSize;
 		private String _charsetName;
 		private int _contentLength = -1;
+		private String _contentEncoding;
 		private String _contentType;
 		private boolean _error;
 		private String _errorMessage;

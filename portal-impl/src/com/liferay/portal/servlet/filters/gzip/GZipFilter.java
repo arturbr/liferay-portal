@@ -17,13 +17,20 @@ package com.liferay.portal.servlet.filters.gzip;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
+import com.liferay.portal.kernel.servlet.CustomHttpServletRequest;
+import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 
+import java.io.IOException;
+
 import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -57,8 +64,18 @@ public class GZipFilter extends BasePortalFilter {
 	}
 
 	@Override
+	public void doFilter(
+		ServletRequest servletRequest, ServletResponse servletResponse,
+		FilterChain filterChain) throws IOException, ServletException {
+		CustomHttpServletRequest customHttpServletRequest =
+			new CustomHttpServletRequest((HttpServletRequest)servletRequest);
+		customHttpServletRequest.setHeader(HttpHeaders.ACCEPT_ENCODING, "");
+		filterChain.doFilter(customHttpServletRequest, servletResponse);
+	}
+
+	@Override
 	public boolean isFilterEnabled() {
-		return _filterEnabled;
+		return false;
 	}
 
 	@Override
@@ -69,7 +86,7 @@ public class GZipFilter extends BasePortalFilter {
 			BrowserSnifferUtil.acceptsGzip(request) &&
 			!isAlreadyFiltered(request)) {
 
-			return true;
+			return false;
 		}
 		else {
 			return false;

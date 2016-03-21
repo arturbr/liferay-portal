@@ -119,7 +119,7 @@ public class GZipResponse extends MetaInfoCacheServletResponse {
 		}
 
 		if (_servletOutputStream == null) {
-			if (_isGZipContentType()) {
+			if (_isGZipContentType() || _isGZipContentEncoding()) {
 				_servletOutputStream = _response.getOutputStream();
 			}
 			else {
@@ -188,6 +188,16 @@ public class GZipResponse extends MetaInfoCacheServletResponse {
 		};
 
 		return new ServletOutputStreamAdapter(gzipOutputStream);
+	}
+
+	private boolean _isGZipContentEncoding() {
+		String contentEncoding = getContentEncoding();
+
+		if (contentEncoding == null || !contentEncoding.equals(_GZIP)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	private boolean _isGZipContentType() {
