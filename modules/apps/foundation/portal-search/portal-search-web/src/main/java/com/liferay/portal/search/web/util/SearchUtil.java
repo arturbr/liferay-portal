@@ -161,6 +161,7 @@ public class SearchUtil {
 			String currentURL)
 		throws Exception {
 
+		try {
 		PortletURL viewContentURL = renderResponse.createRenderURL();
 
 		viewContentURL.setParameter("mvcPath", "/view_content.jsp");
@@ -209,6 +210,10 @@ public class SearchUtil {
 		}
 
 		return viewContentURL.toString();
+		} catch (Exception e) {
+			_log.error(e);
+			return "";
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(SearchUtil.class);
