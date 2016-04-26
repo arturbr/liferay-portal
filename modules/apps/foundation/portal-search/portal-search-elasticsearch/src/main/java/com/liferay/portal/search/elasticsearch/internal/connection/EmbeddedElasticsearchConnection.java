@@ -25,14 +25,20 @@ import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.elasticsearch.configuration.ElasticsearchConfiguration;
 import com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnection;
+import com.liferay.portal.search.elasticsearch.connection.ElasticsearchPluginManager;
 import com.liferay.portal.search.elasticsearch.connection.OperationMode;
 import com.liferay.portal.search.elasticsearch.index.IndexFactory;
 import com.liferay.portal.search.elasticsearch.internal.cluster.ClusterSettingsContext;
+import com.liferay.portal.search.elasticsearch.internal.util.ResourceUtil;
 import com.liferay.portal.search.elasticsearch.settings.SettingsContributor;
 
+import java.io.File;
 import java.io.IOException;
 
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 
 import java.util.Map;
 
@@ -207,13 +213,23 @@ public class EmbeddedElasticsearchConnection
 
 		String zip = "/plugins/" + name + "-" + version + ".zip";
 
+		File tempFile = null;
+
 		try {
+			tempFile = ResourceUtil.getResourceAsTempFile(getClass(), zip);
+
 			EmbeddedElasticsearchPluginManager.installPlugin(
-				name, zip, getClass(), settings);
+				name, settings,
+				createElasticsearchPluginManager(settings, tempFile));
 		}
 		catch (IOException ioe) {
 			throw new RuntimeException(
 				"Unable to install " + name + " plugin from " + zip, ioe);
+		}
+		finally {
+			if (tempFile != null) {
+				tempFile.delete();
+			}
 		}
 	}
 
@@ -271,6 +287,17 @@ public class EmbeddedElasticsearchConnection
 		}
 
 		return client;
+	}
+
+	protected ElasticsearchPluginManager createElasticsearchPluginManager(
+			Settings settings, File tempFile)
+		throws MalformedURLException {
+
+		URI uri = tempFile.toURI();
+
+		URL url = uri.toURL();
+
+		return new ElasticsearchPluginManagerImpl(settings, url);
 	}
 
 	protected Node createNode(Settings settings) {
